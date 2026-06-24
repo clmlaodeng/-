@@ -453,6 +453,62 @@ button {
   color: var(--muted);
 }
 
+.type-profile {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  margin-top: 16px;
+  padding: 16px;
+}
+
+.type-profile-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: start;
+}
+
+.type-profile-head h2 {
+  margin: 3px 0 0;
+  font-size: 22px;
+}
+
+.type-profile-head p:last-child {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.type-profile-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.type-profile-chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #f8fbfe;
+  color: var(--accent-dark);
+  padding: 5px 9px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.type-profile-focus {
+  color: var(--ink);
+  line-height: 1.65;
+  margin: 0 0 12px;
+}
+
+.type-profile-examples {
+  margin: 8px 0 0;
+  padding-left: 22px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
 .type-info {
   display: flex;
   gap: 10px;
