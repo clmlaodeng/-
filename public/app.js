@@ -15,6 +15,11 @@ const useAiInput = document.querySelector("#useAi");
 const aiStatus = document.querySelector("#aiStatus");
 const message = document.querySelector("#message");
 const typeInfo = document.querySelector("#typeInfo span");
+const typeProfileTitle = document.querySelector("#typeProfileTitle");
+const typeProfilePattern = document.querySelector("#typeProfilePattern");
+const typeProfileChips = document.querySelector("#typeProfileChips");
+const typeProfileFocus = document.querySelector("#typeProfileFocus");
+const typeProfileExamples = document.querySelector("#typeProfileExamples");
 const studentList = document.querySelector("#studentList");
 const answerList = document.querySelector("#answerList");
 const printButton = document.querySelector("#printButton");
@@ -105,7 +110,8 @@ function getSelectedCategory() {
 
 function getSelectedType() {
   const category = getSelectedCategory();
-  return category?.types.find((type) => type.id === typeInput.value) || category?.types[0];
+  const type = category?.types.find((item) => item.id === typeInput.value) || category?.types[0];
+  return type ? { ...type, categoryName: category.name } : type;
 }
 
 function getAllTypes() {
@@ -378,6 +384,28 @@ function renderTypeInfo() {
   const type = getSelectedType();
   if (!type) return;
   typeInfo.textContent = `${type.focus} 例：${type.examples.join("、")}`;
+  renderTypeProfile(type);
+}
+
+function renderTypeProfile(type) {
+  typeProfileTitle.textContent = type.name;
+  typeProfilePattern.textContent = `题型结构：${type.pattern}`;
+  typeProfileFocus.textContent = type.focus;
+  typeProfileChips.replaceChildren();
+  typeProfileExamples.replaceChildren();
+
+  [type.categoryName, type.stage, ...(type.displayTags || [])].filter(Boolean).forEach((label) => {
+    const chip = document.createElement("span");
+    chip.className = "type-profile-chip";
+    chip.textContent = label;
+    typeProfileChips.appendChild(chip);
+  });
+
+  (type.examples || []).forEach((example) => {
+    const item = document.createElement("li");
+    item.textContent = example;
+    typeProfileExamples.appendChild(item);
+  });
 }
 
 async function loadCatalog() {

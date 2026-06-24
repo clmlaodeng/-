@@ -61,6 +61,8 @@ test("serves the MVP page, assets, API, and print CSS", async () => {
     assert.match(html, /id="finderPanel"/);
     assert.match(html, /按老师需求找题/);
     assert.match(html, /id="selectedPackPanel"/);
+    assert.match(html, /id="typeProfile"/);
+    assert.match(html, /id="typeProfileExamples"/);
     assert.match(html, /当前专题包覆盖/);
     assert.match(html, /按年级阶段/);
     assert.match(html, /按易错点/);
@@ -92,6 +94,9 @@ test("serves the MVP page, assets, API, and print CSS", async () => {
     assert.match(script, /selectedPackPanel/);
     assert.match(script, /renderSelectedPack/);
     assert.match(script, /pack-type-chip/);
+    assert.match(script, /renderTypeProfile/);
+    assert.match(script, /type-profile-chip/);
+    assert.match(script, /typeProfileExamples/);
     assert.match(script, /typeIds/);
     assert.match(script, /isUsefulPartialAlias/);
     assert.match(script, /function renderAdvantageStats/);
@@ -100,6 +105,8 @@ test("serves the MVP page, assets, API, and print CSS", async () => {
 
     const css = await fetch(`${baseUrl}/styles.css`).then((response) => response.text());
     assert.match(css, /@media print/);
+    assert.match(css, /\.type-profile/);
+    assert.match(css, /\.type-profile-chip/);
     assert.match(css, /\.tool-panel\s*{\s*display:\s*none;/);
 
     const generated = await fetch(`${baseUrl}/api/generate`, {
