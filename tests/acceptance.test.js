@@ -63,6 +63,8 @@ test("serves the MVP page, assets, API, and print CSS", async () => {
     assert.match(html, /id="selectedPackPanel"/);
     assert.match(html, /id="typeProfile"/);
     assert.match(html, /id="typeProfileExamples"/);
+    assert.match(html, /id="keywordDictionary"/);
+    assert.match(html, /id="keywordMap"/);
     assert.match(html, /当前专题包覆盖/);
     assert.match(html, /按年级阶段/);
     assert.match(html, /按易错点/);
@@ -80,6 +82,9 @@ test("serves the MVP page, assets, API, and print CSS", async () => {
     assert.match(script, /wrongWork/);
     assert.match(script, /searchInput/);
     assert.match(script, /renderSearchResults/);
+    assert.match(script, /renderKeywordDictionary/);
+    assert.match(script, /keyword-card/);
+    assert.match(script, /keyword-chip/);
     assert.match(script, /getSearchMatchReason/);
     assert.match(script, /renderNoResultSuggestions/);
     assert.match(script, /search-summary/);
@@ -110,6 +115,8 @@ test("serves the MVP page, assets, API, and print CSS", async () => {
 
     const css = await fetch(`${baseUrl}/styles.css`).then((response) => response.text());
     assert.match(css, /@media print/);
+    assert.match(css, /\.keyword-dictionary/);
+    assert.match(css, /\.keyword-chip/);
     assert.match(css, /\.search-summary/);
     assert.match(css, /\.match-reason/);
     assert.match(css, /\.no-result-suggestions/);
