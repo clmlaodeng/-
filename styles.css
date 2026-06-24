@@ -420,6 +420,64 @@ h2 {
   background: var(--soft);
 }
 
+.keyword-dictionary {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  margin-top: 16px;
+  padding: 16px;
+}
+
+.keyword-map {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.keyword-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f8fbfe;
+  padding: 12px;
+}
+
+.keyword-card strong {
+  display: block;
+  color: var(--accent-dark);
+  margin-bottom: 8px;
+}
+
+.keyword-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding: 7px 0;
+  border-top: 1px solid var(--line);
+}
+
+.keyword-type {
+  flex: 1 0 100%;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.keyword-chip {
+  min-height: 28px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--accent-dark);
+  padding: 0 9px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.keyword-chip:hover {
+  border-color: var(--accent);
+}
+
 .controls {
   display: grid;
   grid-template-columns: 120px minmax(220px, 1fr) minmax(240px, 1.2fr) 120px 140px auto;
@@ -659,6 +717,10 @@ button {
   }
 
   .finder-groups {
+    grid-template-columns: 1fr;
+  }
+
+  .keyword-map {
     grid-template-columns: 1fr;
   }
 

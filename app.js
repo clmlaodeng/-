@@ -7,6 +7,8 @@ const selectedPackSummary = document.querySelector("#selectedPackSummary");
 const selectedPackTypes = document.querySelector("#selectedPackTypes");
 const coverageMap = document.querySelector("#coverageMap");
 const coverageSummary = document.querySelector("#coverageSummary");
+const keywordMap = document.querySelector("#keywordMap");
+const keywordSummary = document.querySelector("#keywordSummary");
 const countInput = document.querySelector("#count");
 const categoryInput = document.querySelector("#category");
 const typeInput = document.querySelector("#type");
@@ -371,6 +373,54 @@ function renderCoverageMap() {
   });
 }
 
+function getDisplayKeywords(type) {
+  const blocked = new Set([type.categoryName, type.name, type.pattern, type.focus, ...(type.examples || [])]);
+  return (type.keywords || [])
+    .filter((keyword) => keyword.length >= 2 && keyword.length <= 12)
+    .filter((keyword) => !blocked.has(keyword))
+    .filter((keyword) => !/^[a-z_+\-/*%\d.]+$/i.test(keyword))
+    .slice(0, 5);
+}
+
+function renderKeywordDictionary() {
+  const allTypes = getAllTypes();
+  const keywordCount = allTypes.reduce((total, type) => total + getDisplayKeywords(type).length, 0);
+  keywordMap.replaceChildren();
+  keywordSummary.textContent = `${keywordCount} 个可点击找题说法，覆盖 ${allTypes.length} 个细分题型。`;
+
+  catalog.forEach((category) => {
+    const card = document.createElement("article");
+    card.className = "keyword-card";
+
+    const title = document.createElement("strong");
+    title.textContent = category.name;
+    card.appendChild(title);
+
+    category.types.slice(0, 4).forEach((type) => {
+      const row = document.createElement("div");
+      row.className = "keyword-row";
+
+      const label = document.createElement("span");
+      label.className = "keyword-type";
+      label.textContent = type.name;
+      row.appendChild(label);
+
+      getDisplayKeywords({ ...type, categoryName: category.name }).forEach((keyword) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "keyword-chip";
+        button.textContent = keyword;
+        button.addEventListener("click", () => applySearchQuery(keyword));
+        row.appendChild(button);
+      });
+
+      card.appendChild(row);
+    });
+
+    keywordMap.appendChild(card);
+  });
+}
+
 function renderFinderPanel() {
   finderGroupsPanel.replaceChildren();
 
@@ -470,6 +520,7 @@ async function loadCatalog() {
     renderTypes();
     renderFinderPanel();
     renderCoverageMap();
+    renderKeywordDictionary();
     renderSearchResults();
   } catch (error) {
       typeInfo.textContent = "题型库加载失败，请刷新页面。";
