@@ -175,6 +175,11 @@ h2 {
   font-size: 14px;
 }
 
+.search-summary {
+  color: var(--accent-dark);
+  font-weight: 800;
+}
+
 .search-result {
   min-height: auto;
   border: 1px solid var(--line);
@@ -196,6 +201,41 @@ h2 {
   font-size: 12px;
   font-weight: 400;
   line-height: 1.45;
+}
+
+.match-reason {
+  margin-top: 4px;
+  color: var(--success);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.no-result-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: #f8fbfe;
+  padding: 10px;
+}
+
+.no-result-suggestions p {
+  flex: 1 0 100%;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.no-result-suggestion {
+  min-height: 30px;
+  border: 1px solid var(--accent);
+  background: #fff;
+  color: var(--accent-dark);
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .search-result:hover {

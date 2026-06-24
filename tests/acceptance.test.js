@@ -80,6 +80,11 @@ test("serves the MVP page, assets, API, and print CSS", async () => {
     assert.match(script, /wrongWork/);
     assert.match(script, /searchInput/);
     assert.match(script, /renderSearchResults/);
+    assert.match(script, /getSearchMatchReason/);
+    assert.match(script, /renderNoResultSuggestions/);
+    assert.match(script, /search-summary/);
+    assert.match(script, /match-reason/);
+    assert.match(script, /no-result-suggestion/);
     assert.match(script, /coverageMap/);
     assert.match(script, /renderCoverageMap/);
     assert.match(script, /coverage-type-button/);
@@ -105,6 +110,9 @@ test("serves the MVP page, assets, API, and print CSS", async () => {
 
     const css = await fetch(`${baseUrl}/styles.css`).then((response) => response.text());
     assert.match(css, /@media print/);
+    assert.match(css, /\.search-summary/);
+    assert.match(css, /\.match-reason/);
+    assert.match(css, /\.no-result-suggestions/);
     assert.match(css, /\.type-profile/);
     assert.match(css, /\.type-profile-chip/);
     assert.match(css, /\.tool-panel\s*{\s*display:\s*none;/);
