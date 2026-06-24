@@ -1,4 +1,4 @@
-const form = document.querySelector("#generatorForm");
+﻿const form = document.querySelector("#generatorForm");
 const searchInput = document.querySelector("#searchInput");
 const searchResults = document.querySelector("#searchResults");
 const finderGroupsPanel = document.querySelector("#finderGroups");
@@ -35,8 +35,8 @@ function normalizeSearchText(value) {
   return String(value || "")
     .toLowerCase()
     .replace(/\s+/g, "")
-    .replace(/×/g, "*")
-    .replace(/÷/g, "/");
+    .replace(/脳/g, "*")
+    .replace(/梅/g, "/");
 }
 
 function isUsefulPartialAlias(alias) {
@@ -213,6 +213,22 @@ function scoreCatalogMatch(type, normalizedQuery) {
   return haystack.includes(normalizedQuery) ? 10 : 0;
 }
 
+function getSearchMatchReason(type, query) {
+  const normalizedQuery = normalizeSearchText(query);
+  const aliases = (type.keywords || []).map(normalizeSearchText);
+  const directText = normalizeSearchText([type.name, type.pattern, type.focus, ...(type.examples || [])].join(" "));
+
+  if (inferTypeIdsFromEquation(query).includes(type.id)) return "根据粘贴例题定位";
+  if (normalizeSearchText(type.name) === normalizedQuery) return "细分题型名称完全匹配";
+  if (aliases.some((alias) => alias === normalizedQuery)) return "教师常用说法完全匹配";
+  if (aliases.some((alias) => alias.includes(normalizedQuery) || normalizedQuery.includes(alias))) {
+    return "命中同义词/课堂说法";
+  }
+  if (directText.includes(normalizedQuery)) return "命中题型结构、训练重点或例题";
+  if (normalizeSearchText(type.categoryName).includes(normalizedQuery)) return "命中大专项分类";
+  return "相关题型推荐";
+}
+
 function searchCatalog(query) {
   const normalizedQuery = normalizeSearchText(query);
   if (!normalizedQuery) return [];
@@ -236,8 +252,42 @@ function searchCatalog(query) {
     .map((item) => item.type);
 }
 
+function selectFinderItem(item) {
+  selectedPackTypeIds = Array.isArray(item.typeIds) ? item.typeIds : [];
+  selectedPackLabel = item.label;
+  renderSelectedPack();
+  applySearchQuery(item.query);
+  if (selectedPackTypeIds.length > 0) {
+    setMessage(`已选择「${item.label}」组合包，点击生成会混合这些细分题型。`, true);
+  }
+}
+
+function renderNoResultSuggestions(query) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "no-result-suggestions";
+
+  const text = document.createElement("p");
+  text.textContent = `暂时没有精确匹配「${query}」。可以先从这些高频专题包进入，再微调细分题型。`;
+  wrapper.appendChild(text);
+
+  finderGroups
+    .flatMap((group) => group.items || [])
+    .slice(0, 6)
+    .forEach((item) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "no-result-suggestion";
+      button.textContent = item.label;
+      button.addEventListener("click", () => selectFinderItem(item));
+      wrapper.appendChild(button);
+    });
+
+  searchResults.appendChild(wrapper);
+}
+
 function renderSearchResults() {
-  const results = searchCatalog(searchInput.value).slice(0, 8);
+  const allResults = searchCatalog(searchInput.value);
+  const results = allResults.slice(0, 8);
   searchResults.replaceChildren();
 
   if (!searchInput.value.trim()) {
@@ -246,9 +296,14 @@ function renderSearchResults() {
   }
 
   if (results.length === 0) {
-    searchResults.textContent = "暂时没有匹配题型，可以换个关键词。";
+    renderNoResultSuggestions(searchInput.value.trim());
     return;
   }
+
+  const summary = document.createElement("div");
+  summary.className = "search-summary";
+  summary.textContent = `找到 ${allResults.length} 个匹配题型，优先展示最相关的 ${results.length} 个。`;
+  searchResults.appendChild(summary);
 
   results.forEach((type) => {
     const button = document.createElement("button");
@@ -262,7 +317,11 @@ function renderSearchResults() {
     meta.className = "type-meta";
     meta.textContent = `${type.stage} · ${(type.displayTags || []).join(" / ")} · ${type.exampleHint}`;
 
-    button.append(title, meta);
+    const reason = document.createElement("small");
+    reason.className = "match-reason";
+    reason.textContent = getSearchMatchReason(type, searchInput.value);
+
+    button.append(title, meta, reason);
     button.addEventListener("click", () => {
       selectType(type.categoryId, type.id);
       searchInput.value = type.name;
@@ -282,7 +341,7 @@ function renderCoverageMap() {
     card.className = "coverage-card";
     card.innerHTML = `
       <strong>${category.name}</strong>
-      <span>${category.types.length} 个题型</span>
+      <span>${category.types.length} 涓鍨?/span>
       <div class="coverage-type-list"></div>
     `;
 
@@ -328,15 +387,7 @@ function renderFinderPanel() {
       button.type = "button";
       button.className = "finder-item";
       button.innerHTML = `<span>${item.label}</span><small>${item.note}</small>`;
-      button.addEventListener("click", () => {
-        selectedPackTypeIds = Array.isArray(item.typeIds) ? item.typeIds : [];
-        selectedPackLabel = item.label;
-        renderSelectedPack();
-        applySearchQuery(item.query);
-        if (selectedPackTypeIds.length > 0) {
-          setMessage(`已选择「${item.label}」组合包，点击生成会混合这些细分题型。`, true);
-        }
-      });
+      button.addEventListener("click", () => selectFinderItem(item));
       card.appendChild(button);
     });
 
@@ -373,7 +424,7 @@ function renderTypes() {
   category.types.forEach((type) => {
     const option = document.createElement("option");
     option.value = type.id;
-    option.textContent = `${type.name}（${type.pattern}）`;
+    option.textContent = `${type.name}：${type.pattern}`;
     typeInput.appendChild(option);
   });
 
@@ -421,7 +472,7 @@ async function loadCatalog() {
     renderCoverageMap();
     renderSearchResults();
   } catch (error) {
-    typeInfo.textContent = "题型库加载失败，请刷新页面。";
+      typeInfo.textContent = "题型库加载失败，请刷新页面。";
   }
 }
 
@@ -467,7 +518,7 @@ async function generatePractice(event) {
 
     const result = await response.json();
     if (!response.ok) {
-      throw new Error(result.error || "生成失败");
+      throw new Error(result.error || "鐢熸垚澶辫触");
     }
 
     renderProblems(result.problems);
@@ -502,3 +553,4 @@ printButton.addEventListener("click", () => window.print());
 
 loadCatalog();
 loadConfigStatus();
+
