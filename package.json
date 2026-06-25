@@ -2,7 +2,7 @@
   "name": "equation-practice-generator",
   "version": "0.1.0",
   "private": true,
-  "description": "本地可运行的解方程练习生成器 MVP",
+  "description": "本地可运行的解方程专项练习生成器",
   "scripts": {
     "start": "node server.js",
     "test": "node --test tests/*.test.js",
