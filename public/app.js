@@ -15,7 +15,8 @@ const typeInput = document.querySelector("#type");
 const includeSolutionInput = document.querySelector("#includeSolution");
 const useAiInput = document.querySelector("#useAi");
 const aiStatus = document.querySelector("#aiStatus");
-const message = document.querySelector("#message");
+const messageArea = document.querySelector("#messageArea");
+const messageText = document.querySelector("#messageText");
 const typeInfo = document.querySelector("#typeInfo span");
 const typeProfileTitle = document.querySelector("#typeProfileTitle");
 const typeProfilePattern = document.querySelector("#typeProfilePattern");
@@ -27,6 +28,13 @@ const answerList = document.querySelector("#answerList");
 const printButton = document.querySelector("#printButton");
 const categoryCountLabel = document.querySelector("#categoryCountLabel");
 const typeCountLabel = document.querySelector("#typeCountLabel");
+const quickStart = document.querySelector("#quickStart");
+const dismissQuickStart = document.querySelector("#dismissQuickStart");
+const studentEmpty = document.querySelector("#studentEmpty");
+const answerEmpty = document.querySelector("#answerEmpty");
+const apiKeyInput = document.querySelector("#apiKeyInput");
+const apiKeyRow = document.querySelector("#apiKeyRow");
+const mobileGenerateBtn = document.querySelector("#mobileGenerateBtn");
 
 let catalog = [];
 let finderGroups = [];
@@ -45,9 +53,92 @@ function isUsefulPartialAlias(alias) {
   return alias.length >= 2;
 }
 
-function setMessage(text, strong = false) {
-  message.textContent = text;
-  message.classList.toggle("strong", strong);
+const MESSAGE_TIMERS = {};
+
+function setMessage(text, type = "info") {
+  messageText.textContent = text;
+  messageArea.className = `message-area ${type}`;
+  messageArea.hidden = false;
+
+  clearTimeout(MESSAGE_TIMERS._hide);
+  if (type === "success") {
+    MESSAGE_TIMERS._hide = setTimeout(() => {
+      messageArea.hidden = true;
+    }, 4000);
+  }
+}
+
+function clearMessage() {
+  messageArea.hidden = true;
+}
+
+function getStoredApiKey() {
+  try {
+    return localStorage.getItem("eqgen_api_key") || "";
+  } catch (e) {
+    return "";
+  }
+}
+
+function saveApiKey(key) {
+  try {
+    localStorage.setItem("eqgen_api_key", key);
+  } catch (e) { /* ignore */ }
+}
+
+function createBrowserAiCaller(apiKey) {
+  const isDeepseek = !apiKey.startsWith("sk-");
+  const baseUrl = isDeepseek
+    ? "https://api.deepseek.com/chat/completions"
+    : "https://api.openai.com/v1/chat/completions";
+  const model = isDeepseek ? "deepseek-chat" : "gpt-4o-mini";
+
+  return async function (options) {
+    const prompt = [
+      "你是一名小学高年级到初一数学老师。",
+      "请生成基础解方程练习题，避免超纲，只输出 JSON。",
+      `题目数量：${options.count}`,
+      `难度：${options.difficulty || "medium"}`,
+      `是否包含解析：${options.includeSolution !== false}`,
+      'JSON 格式：{"problems":[{"question":"2x + 3 = 9","answer":3,"solution":"..."}]}',
+    ].join("\n");
+
+    const response = await fetch(baseUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model,
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`AI 请求失败 (${response.status})`);
+    }
+
+    const data = await response.json();
+    const text = data.choices?.[0]?.message?.content || "";
+    const cleaned = text.replace(/^```json\s*/i, "").replace(/```$/i, "").trim();
+    const parsed = JSON.parse(cleaned);
+
+    if (!Array.isArray(parsed.problems)) {
+      throw new Error("AI 返回格式异常");
+    }
+
+    return {
+      message: "已使用 AI 增强生成。",
+      problems: parsed.problems.map((p) => ({
+        question: String(p.question || ""),
+        answer: Number(p.answer),
+        solution: options.includeSolution === false ? "" : String(p.solution || ""),
+        equation: p.equation || null,
+      })),
+    };
+  };
 }
 
 function createListItem(className, children) {
@@ -67,6 +158,9 @@ function textBlock(className, text) {
 function renderProblems(problems) {
   studentList.replaceChildren();
   answerList.replaceChildren();
+
+  studentEmpty.hidden = problems.length > 0;
+  answerEmpty.hidden = problems.length > 0;
 
   problems.forEach((problem) => {
     const studentChildren = [
@@ -260,7 +354,8 @@ function selectFinderItem(item) {
   renderSelectedPack();
   applySearchQuery(item.query);
   if (selectedPackTypeIds.length > 0) {
-    setMessage(`已选择「${item.label}」组合包，点击生成会混合这些细分题型。`, true);
+    setMessage(`已选择「${item.label}」组合包，点击生成会混合这些细分题型。`, "success");
+    document.querySelector("#generatorForm").scrollIntoView({ behavior: "smooth", block: "center" });
   }
 }
 
@@ -509,12 +604,53 @@ function renderTypeProfile(type) {
   });
 }
 
-async function loadCatalog() {
+function shouldShowQuickStart() {
   try {
-    const response = await fetch("/api/catalog");
-    const data = await response.json();
-    catalog = data.categories || [];
-    finderGroups = data.finderGroups || [];
+    return localStorage.getItem("eqgen_quickstart_dismissed") !== "1";
+  } catch (e) {
+    return true;
+  }
+}
+
+function initQuickstart() {
+  if (!quickStart) return;
+
+  if (!shouldShowQuickStart()) {
+    quickStart.hidden = true;
+    return;
+  }
+
+  quickStart.hidden = false;
+
+  quickStart.querySelectorAll(".qs-card").forEach((card) => {
+    card.addEventListener("click", () => {
+      const action = card.dataset.action;
+      if (action === "stage") {
+        document.querySelector(".stage-nav").scrollIntoView({ behavior: "smooth", block: "center" });
+        setMessage("请选择年级阶段，或点击下方快捷按钮。", "info");
+      } else if (action === "search") {
+        searchInput.scrollIntoView({ behavior: "smooth", block: "center" });
+        searchInput.focus();
+        setMessage("输入关键词或点击分类标签找到对应题型。", "info");
+      } else if (action === "generate") {
+        document.querySelector("#generatorForm").scrollIntoView({ behavior: "smooth", block: "center" });
+        setMessage("选择题型和数量后，点击「生成练习」即可。", "info");
+      }
+    });
+  });
+
+  dismissQuickStart.addEventListener("click", () => {
+    quickStart.hidden = true;
+    try {
+      localStorage.setItem("eqgen_quickstart_dismissed", "1");
+    } catch (e) { /* ignore */ }
+  });
+}
+
+function loadCatalog() {
+  try {
+    catalog = getTypeCatalog();
+    finderGroups = getFinderGroups();
     renderAdvantageStats();
     renderCategories();
     renderTypes();
@@ -522,64 +658,89 @@ async function loadCatalog() {
     renderCoverageMap();
     renderKeywordDictionary();
     renderSearchResults();
+    initQuickstart();
   } catch (error) {
-      typeInfo.textContent = "题型库加载失败，请刷新页面。";
+    typeInfo.textContent = "题型库加载失败，请刷新页面。";
   }
 }
 
-async function loadConfigStatus() {
+function loadConfigStatus() {
   try {
-    const response = await fetch("/api/config-status");
-    const status = await response.json();
-
-    if (status.aiAvailable) {
+    const key = getStoredApiKey();
+    if (key) {
       aiStatus.textContent = "AI增强可用";
       useAiInput.disabled = false;
+      if (apiKeyInput) apiKeyInput.value = key;
     } else {
       aiStatus.textContent = "本地规则可用";
       useAiInput.checked = false;
-      useAiInput.disabled = true;
+      useAiInput.disabled = false;
     }
-  } catch (error) {
+  } catch (e) {
     aiStatus.textContent = "本地规则可用";
     useAiInput.checked = false;
-    useAiInput.disabled = true;
+    useAiInput.disabled = false;
   }
 }
 
 async function generatePractice(event) {
   event.preventDefault();
-  setMessage("正在生成练习...");
+  setMessage("正在生成练习...", "loading");
 
-  const payload = {
+  const useAi = useAiInput.checked;
+  const apiKey = getStoredApiKey();
+
+  const options = {
     count: Number(countInput.value),
     categoryId: categoryInput.value,
     typeId: typeInput.value,
     typeIds: selectedPackTypeIds,
     includeSolution: includeSolutionInput.checked,
-    useAi: useAiInput.checked,
+    useAi: useAi && !!apiKey,
   };
 
   try {
-    const response = await fetch("/api/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.error || "鐢熸垚澶辫触");
+    let result;
+    if (options.useAi) {
+      result = await generateProblems(options, { aiAvailable: true, callAi: createBrowserAiCaller(apiKey) });
+    } else {
+      result = await generateProblems(options, { aiAvailable: false });
     }
 
     renderProblems(result.problems);
-    setMessage(result.message || "已生成练习。", true);
+    setMessage(result.message || "已生成练习。", "success");
   } catch (error) {
-    setMessage(`生成失败：${error.message}`);
+    setMessage("生成失败：" + error.message, "error");
   }
 }
 
 form.addEventListener("submit", generatePractice);
+
+// API Key 输入管理
+useAiInput.addEventListener("change", () => {
+  if (useAiInput.checked) {
+    apiKeyRow.hidden = false;
+    if (!getStoredApiKey()) {
+      setMessage("请在下方的 AI Key 输入框中填入你的 OpenAI 或 DeepSeek Key", "info");
+    }
+  } else {
+    apiKeyRow.hidden = true;
+  }
+});
+
+apiKeyInput.addEventListener("input", () => {
+  const val = apiKeyInput.value.trim();
+  saveApiKey(val);
+  if (val) {
+    aiStatus.textContent = "AI增强可用";
+    useAiInput.disabled = false;
+  }
+});
+
+// 手机底部生成按钮
+mobileGenerateBtn.addEventListener("click", () => {
+  form.dispatchEvent(new Event("submit"));
+});
 categoryInput.addEventListener("change", renderTypes);
 typeInput.addEventListener("change", renderTypeInfo);
 searchInput.addEventListener("input", renderSearchResults);

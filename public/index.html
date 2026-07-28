@@ -21,13 +21,37 @@
         <div class="advantage-grid" aria-label="产品优势">
           <div><strong id="categoryCountLabel">13 大专项</strong><span>方程概念、比例百分数、特殊位置、括号、去分母、综合题、应用题等</span></div>
           <div><strong id="typeCountLabel">58 个细分题型</strong><span>覆盖概念、计算、几 x 作减数/除数、解比例、去分母、综合五步法、列方程应用题</span></div>
-          <div><strong>按年级 / 说法 / 例题找题</strong><span>搜“五年级上册”“初一一元一次方程”，也能粘贴 3(x+2)=20 定位</span></div>
+          <div><strong>按年级 / 说法 / 例题找题</strong><span>搜"五年级上册""初一一元一次方程"，也能粘贴 3(x+2)=20 定位</span></div>
         </div>
+
+        <!-- 快速上手引导 -->
+        <section class="quickstart" id="quickStart" aria-labelledby="quickstartTitle">
+          <button class="quickstart-dismiss" id="dismissQuickStart" type="button" title="下次不再显示">✕ 不再显示</button>
+          <h2 id="quickstartTitle">📐 三步出题</h2>
+          <p class="quickstart-desc">不用读完所有内容，跟着三步走，一分钟生成一份专项练习</p>
+          <div class="quickstart-steps">
+            <button class="qs-card" data-action="stage" type="button">
+              <span class="qs-num">1</span>
+              <strong>选专题</strong>
+              <span>搜年级/说法，或点击下方专题包</span>
+            </button>
+            <button class="qs-card" data-action="search" type="button">
+              <span class="qs-num">2</span>
+              <strong>找题型</strong>
+              <span>搜索框输入关键词定位细分题型</span>
+            </button>
+            <button class="qs-card" data-action="generate" type="button">
+              <span class="qs-num">3</span>
+              <strong>生成打印</strong>
+              <span>设数量，一键出学生版+教师版</span>
+            </button>
+          </div>
+        </section>
 
         <div class="search-panel">
           <label>
             搜索题型
-            <input id="searchInput" type="search" placeholder="输入：五年级上册、六年级比例、初一一元一次方程；也可粘贴 3(x+2)=20..." />
+            <input id="searchInput" type="search" placeholder="搜"五年级上册"、"两边都有x"、"去分母漏乘"… 也可粘贴 3(x+2)=20" />
           </label>
           <div class="stage-nav" aria-label="阶段导航">
             <span>阶段导航</span>
@@ -35,34 +59,53 @@
             <button type="button" class="stage-entry" data-query="六年级比例">六年级比例百分数</button>
             <button type="button" class="stage-entry" data-query="初一一元一次方程">初一综合</button>
           </div>
-          <div class="quick-tags" aria-label="快捷搜索">
-            <button type="button" data-query="未知数在分母">未知数在分母</button>
-            <button type="button" data-query="五年级上册">五年级上册</button>
-            <button type="button" data-query="六年级比例">六年级比例</button>
-            <button type="button" data-query="初一一元一次方程">初一一元一次方程</button>
-            <button type="button" data-query="分母有x">分母有 x</button>
-            <button type="button" data-query="去括号变号">去括号变号</button>
-            <button type="button" data-query="去分母">去分母</button>
-            <button type="button" data-query="综合解方程">综合解方程</button>
-            <button type="button" data-query="百分数方程">百分数方程</button>
-            <button type="button" data-query="解比例">解比例</button>
-            <button type="button" data-query="追及问题">追及问题</button>
-            <button type="button" data-query="顺逆水">顺逆水</button>
-            <button type="button" data-query="小数点错位">小数点错位</button>
-            <button type="button" data-query="分数倒数错误">分数倒数错误</button>
-            <button type="button" data-query="年龄问题">年龄问题</button>
-            <button type="button" data-query="工程问题">工程问题</button>
-            <button type="button" data-query="分配问题">分配问题</button>
-            <button type="button" data-query="检验答案">检验答案</button>
-            <button type="button" data-query="等量关系">等量关系</button>
-            <button type="button" data-query="两边都有未知数">两边都有未知数</button>
-            <button type="button" data-query="同类项合并">同类项合并</button>
-            <button type="button" data-query="一般方程">一般方程</button>
-            <button type="button" data-query="特殊方程">特殊方程</button>
-            <button type="button" data-query="把几x看作一个整体">把几 x 看作整体</button>
-            <button type="button" data-query="能算的先算">能算的先算</button>
-            <button type="button" data-query="应用题">应用题</button>
-          </div>
+
+          <details class="quick-tags-group" open>
+            <summary>按年级阶段</summary>
+            <div class="quick-tags">
+              <button type="button" data-query="五年级上册">五年级上册</button>
+              <button type="button" data-query="六年级比例">六年级比例</button>
+              <button type="button" data-query="初一一元一次方程">初一一元一次方程</button>
+            </div>
+          </details>
+          <details class="quick-tags-group">
+            <summary>按题型特征</summary>
+            <div class="quick-tags">
+              <button type="button" data-query="一般方程">一般方程</button>
+              <button type="button" data-query="特殊方程">特殊方程</button>
+              <button type="button" data-query="两边都有未知数">两边都有未知数</button>
+              <button type="button" data-query="同类项合并">同类项合并</button>
+              <button type="button" data-query="把几x看作一个整体">把几 x 看作整体</button>
+              <button type="button" data-query="能算的先算">能算的先算</button>
+              <button type="button" data-query="百分数方程">百分数方程</button>
+              <button type="button" data-query="解比例">解比例</button>
+              <button type="button" data-query="综合解方程">综合解方程</button>
+            </div>
+          </details>
+          <details class="quick-tags-group">
+            <summary>按易错点</summary>
+            <div class="quick-tags">
+              <button type="button" data-query="未知数在分母">未知数在分母</button>
+              <button type="button" data-query="分母有x">分母有 x</button>
+              <button type="button" data-query="去括号变号">去括号变号</button>
+              <button type="button" data-query="去分母">去分母</button>
+              <button type="button" data-query="小数点错位">小数点错位</button>
+              <button type="button" data-query="分数倒数错误">分数倒数错误</button>
+              <button type="button" data-query="检验答案">检验答案</button>
+              <button type="button" data-query="等量关系">等量关系</button>
+            </div>
+          </details>
+          <details class="quick-tags-group">
+            <summary>应用题</summary>
+            <div class="quick-tags">
+              <button type="button" data-query="追及问题">追及问题</button>
+              <button type="button" data-query="顺逆水">顺逆水</button>
+              <button type="button" data-query="年龄问题">年龄问题</button>
+              <button type="button" data-query="工程问题">工程问题</button>
+              <button type="button" data-query="分配问题">分配问题</button>
+              <button type="button" data-query="应用题">应用题</button>
+            </div>
+          </details>
           <div id="searchResults" class="search-results" aria-live="polite"></div>
         </div>
 
@@ -72,7 +115,7 @@
               <p class="paper-kicker">找题入口</p>
               <h2 id="finderTitle">按老师需求找题</h2>
             </div>
-            <p>按年级阶段、易错点、题面特征直接进入对应专项，突出我们“解方程足够细”的优势。</p>
+            <p>按年级阶段、易错点、题面特征直接进入对应专项，突出我们"解方程足够细"的优势。</p>
           </div>
           <div id="finderGroups" class="finder-groups">
             <article class="finder-group"><strong>按年级阶段</strong></article>
@@ -92,59 +135,56 @@
           <div id="selectedPackTypes" class="pack-type-list"></div>
         </section>
 
-        <section class="coverage-panel" aria-labelledby="coverageTitle">
+        <!-- 生成表单前置 -->
+        <section class="generate-section" aria-labelledby="generateTitle">
           <div class="coverage-title-row">
             <div>
-              <p class="paper-kicker">覆盖清单</p>
-              <h2 id="coverageTitle">题型全景图</h2>
+              <p class="paper-kicker">生成练习</p>
+              <h2 id="generateTitle">设置并生成</h2>
             </div>
-            <p id="coverageSummary">正在加载专项覆盖...</p>
           </div>
-          <div id="coverageMap" class="coverage-map"></div>
-        </section>
+          <form id="generatorForm" class="controls">
+            <label>
+              题目数量
+              <input id="count" name="count" type="number" min="1" max="30" value="10" />
+            </label>
 
-        <section id="keywordDictionary" class="keyword-dictionary" aria-labelledby="keywordDictionaryTitle">
-          <div class="coverage-title-row">
-            <div>
-              <p class="paper-kicker">找题词典</p>
-              <h2 id="keywordDictionaryTitle">老师怎么说，都能找到</h2>
+            <label>
+              专项分类
+              <select id="category" name="category"></select>
+            </label>
+
+            <label>
+              细分题型
+              <select id="type" name="type"></select>
+            </label>
+
+            <label class="check-row">
+              <input id="includeSolution" name="includeSolution" type="checkbox" checked />
+              显示解析
+            </label>
+
+            <label class="check-row">
+              <input id="useAi" name="useAi" type="checkbox" />
+              使用 AI 增强
+            </label>
+
+            <label class="api-key-row" id="apiKeyRow" hidden>
+              AI Key
+              <input id="apiKeyInput" type="password" placeholder="sk-...（OpenAI）或 DeepSeek Key" autocomplete="off" />
+              <small>Key 只存你手机浏览器里，不会上传</small>
+            </label>
+
+            <div class="button-row">
+              <button type="submit" class="primary-button large">生成练习</button>
+              <button type="button" id="printButton" class="secondary-button">打印练习</button>
             </div>
-            <p id="keywordSummary">正在整理题型关键词...</p>
+          </form>
+
+          <div id="messageArea" class="message-area" role="status" aria-live="polite" hidden>
+            <span id="messageText"></span>
           </div>
-          <div id="keywordMap" class="keyword-map"></div>
         </section>
-
-        <form id="generatorForm" class="controls">
-          <label>
-            题目数量
-            <input id="count" name="count" type="number" min="1" max="30" value="10" />
-          </label>
-
-          <label>
-            专项分类
-            <select id="category" name="category"></select>
-          </label>
-
-          <label>
-            细分题型
-            <select id="type" name="type"></select>
-          </label>
-
-          <label class="check-row">
-            <input id="includeSolution" name="includeSolution" type="checkbox" checked />
-            显示解析
-          </label>
-
-          <label class="check-row">
-            <input id="useAi" name="useAi" type="checkbox" />
-            使用 AI 增强
-          </label>
-
-          <div class="button-row">
-            <button type="submit" class="primary-button">生成练习</button>
-            <button type="button" id="printButton" class="secondary-button">打印练习</button>
-          </div>
-        </form>
 
         <section id="typeProfile" class="type-profile" aria-labelledby="typeProfileTitle">
           <div class="type-profile-head">
@@ -167,7 +207,25 @@
           <span>正在加载题型库...</span>
         </div>
 
-        <p id="message" class="message" role="status">选择专项题型后，点击生成即可。</p>
+        <!-- 题型全景图 - 可折叠 -->
+        <details class="coverage-panel collapsible-section" id="coverageDetails">
+          <summary>
+            <span class="collapsible-kicker">覆盖清单</span>
+            <strong>题型全景图</strong>
+            <small id="coverageSummary">正在加载专项覆盖...</small>
+          </summary>
+          <div id="coverageMap" class="coverage-map"></div>
+        </details>
+
+        <!-- 找题词典 - 可折叠 -->
+        <details class="keyword-dictionary collapsible-section" id="keywordDictionary">
+          <summary>
+            <span class="collapsible-kicker">找题词典</span>
+            <strong>老师怎么说，都能找到</strong>
+            <small id="keywordSummary">正在整理题型关键词...</small>
+          </summary>
+          <div id="keywordMap" class="keyword-map"></div>
+        </details>
       </section>
 
       <section class="paper-section">
@@ -179,6 +237,9 @@
           <div class="paper-meta">姓名：__________　日期：__________</div>
         </div>
         <ol id="studentList" class="problem-list"></ol>
+        <div id="studentEmpty" class="paper-empty">
+          <p>👆 上方选择题型后点击「生成练习」，学生版题目将显示在这里</p>
+        </div>
       </section>
 
       <section class="paper-section answer-section">
@@ -189,9 +250,16 @@
           </div>
         </div>
         <ol id="answerList" class="answer-list"></ol>
+        <div id="answerEmpty" class="paper-empty">
+          <p>👆 勾选「显示解析」后，教师版答案和逐步解析将显示在这里</p>
+        </div>
       </section>
+      <div class="mobile-generate-bar" aria-hidden="true">
+        <button type="button" id="mobileGenerateBtn" class="primary-button large">📝 生成练习</button>
+      </div>
     </main>
 
+    <script src="/generator.js"></script>
     <script src="/app.js"></script>
   </body>
 </html>

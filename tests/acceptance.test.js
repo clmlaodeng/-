@@ -74,9 +74,11 @@ test("serves the MVP page, assets, API, and print CSS", async () => {
     assert.match(html, /答案与解析/);
 
     const script = await fetch(`${baseUrl}/app.js`).then((response) => response.text());
-    assert.match(script, /api\/config-status/);
-    assert.match(script, /api\/catalog/);
-    assert.match(script, /api\/generate/);
+    assert.match(script, /getTypeCatalog\(\)/);
+    assert.match(script, /getFinderGroups\(\)/);
+    assert.match(script, /generateProblems\(/);
+    assert.match(script, /createBrowserAiCaller/);
+    assert.match(script, /getStoredApiKey/);
     assert.match(script, /typeId/);
     assert.match(script, /modelEquation/);
     assert.match(script, /wrongWork/);
